@@ -1,0 +1,259 @@
+{
+  "adminData": {
+    "clients": [
+      {
+        "id": "cl-1",
+        "name": "Evelyn Carter",
+        "email": "evelyn.carter@example.com",
+        "phone": "+1 (555) 201-4401",
+        "riskLevel": "High",
+        "status": "Active"
+      },
+      {
+        "id": "cl-2",
+        "name": "Daniel Brooks",
+        "email": "daniel.brooks@example.com",
+        "phone": "+1 (555) 334-8218",
+        "riskLevel": "Medium",
+        "status": "Active"
+      },
+      {
+        "id": "cl-3",
+        "name": "Sophia Reed",
+        "email": "sophia.reed@example.com",
+        "phone": "+1 (555) 912-0027",
+        "riskLevel": "Medium",
+        "status": "Pending"
+      }
+    ],
+    "cases": [
+      {
+        "id": "1234",
+        "clientId": "cl-1",
+        "title": "Crypto Recovery",
+        "type": "Bitcoin scam",
+        "amount": 50000,
+        "status": "Tracing",
+        "priority": "Critical",
+        "assignedTo": "Miriam Okeke"
+      },
+      {
+        "id": "1200",
+        "clientId": "cl-2",
+        "title": "Investment Fraud",
+        "type": "Ponzi scheme",
+        "amount": 30000,
+        "status": "Resolved",
+        "priority": "Medium",
+        "assignedTo": "Tunde Hassan"
+      },
+      {
+        "id": "1277",
+        "clientId": "cl-3",
+        "title": "Wallet Compromise",
+        "type": "Unauthorized withdrawal",
+        "amount": 41500,
+        "status": "Evidence review",
+        "priority": "High",
+        "assignedTo": "Rina Cole"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-1",
+        "caseId": "1234",
+        "title": "Review exchange subpoena response",
+        "owner": "Miriam Okeke",
+        "dueDate": "2026-04-27",
+        "completed": false
+      },
+      {
+        "id": "task-2",
+        "caseId": "1277",
+        "title": "Verify uploaded wallet screenshots",
+        "owner": "Rina Cole",
+        "dueDate": "2026-04-26",
+        "completed": false
+      },
+      {
+        "id": "task-3",
+        "caseId": "1200",
+        "title": "Confirm final payout receipt",
+        "owner": "Tunde Hassan",
+        "dueDate": "2026-04-25",
+        "completed": true
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": "msg-1",
+      "senderRole": "admin",
+      "senderName": "Sarah Johnson",
+      "body": "Please review the updated case timeline for Case #1234. We have new information about the recovery process.",
+      "timestamp": "2026-04-25T08:30:00.000Z",
+      "caseId": "1234",
+      "subject": "Case update",
+      "readByAdmin": true,
+      "readByClient": true
+    },
+    {
+      "id": "msg-2",
+      "senderRole": "admin",
+      "senderName": "Mike Chen",
+      "body": "Great news. Your Case #1200 has been successfully resolved and the funds transfer has been initiated.",
+      "timestamp": "2026-04-22T14:15:00.000Z",
+      "caseId": "1200",
+      "subject": "Recovery complete",
+      "readByAdmin": true,
+      "readByClient": true
+    },
+    {
+      "id": "msg-3",
+      "senderRole": "client",
+      "senderName": "Client User",
+      "body": "Thank you. I have uploaded the additional wallet screenshots you requested for Case #1234.",
+      "timestamp": "2026-04-24T16:20:00.000Z",
+      "caseId": "1234",
+      "subject": "Additional evidence uploaded",
+      "readByAdmin": true,
+      "readByClient": true
+    },
+    {
+      "id": "msg-1777283559186",
+      "timestamp": "2026-04-27T09:52:39.186Z",
+      "senderRole": "client",
+      "senderName": "Client User",
+      "body": "my name is abdullahi bello what you",
+      "caseId": "1234",
+      "subject": "Client message for Case #1234",
+      "readByAdmin": true,
+      "readByClient": true
+    }
+  ],
+  "adminPortal": {
+    "alerts": [
+      {
+        "id": "AL-204",
+        "severity": "Critical",
+        "headline": "Suspicious payout instruction flagged",
+        "detail": "FR-1284 includes a destination wallet that failed prior screening.",
+        "owner": "Compliance desk",
+        "state": "Open"
+      },
+      {
+        "id": "AL-198",
+        "severity": "High",
+        "headline": "Duplicate identity document detected",
+        "detail": "Client onboarding pack for FR-1277 requires manual verification.",
+        "owner": "Client verification",
+        "state": "Open"
+      },
+      {
+        "id": "AL-193",
+        "severity": "Medium",
+        "headline": "High-volume inbound messages",
+        "detail": "A potential scam cluster is affecting 4 new consultation requests.",
+        "owner": "Intake team",
+        "state": "Open"
+      }
+    ],
+    "approvals": [
+      {
+        "item": "Release external trace request",
+        "subject": "FR-1281",
+        "amount": "$12,400 fee reserve",
+        "approver": "Legal + finance",
+        "state": "Pending"
+      },
+      {
+        "item": "Client reimbursement transfer",
+        "subject": "FR-1200",
+        "amount": "$25,000 recovery payout",
+        "approver": "Finance controller",
+        "state": "Pending"
+      },
+      {
+        "item": "Evidence vendor invoice",
+        "subject": "FR-1274",
+        "amount": "$3,600 due today",
+        "approver": "Operations lead",
+        "state": "Pending"
+      }
+    ],
+    "communications": [
+      {
+        "audience": "11 active clients",
+        "title": "Weekly recovery status digest",
+        "status": "Ready to send",
+        "note": "Includes updated milestones and pending document requests."
+      },
+      {
+        "audience": "New consultation leads",
+        "title": "Intake expectation setting",
+        "status": "Needs review",
+        "note": "Clarifies required evidence before assigning an analyst."
+      },
+      {
+        "audience": "Dormant cases",
+        "title": "Re-engagement campaign",
+        "status": "Scheduled",
+        "note": "Targets clients waiting more than 21 days on missing paperwork."
+      }
+    ],
+    "moduleEvents": [
+      {
+        "id": "evt-1",
+        "title": "Module activated",
+        "detail": "Risk, approvals, and comms controls are ready for admin actions.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  "auth": {
+    "users": [
+      {
+        "id": "1",
+        "email": "admin@fundrecovery.com",
+        "password": "FR-Admin-2026!",
+        "role": "admin",
+        "name": "Admin User"
+      },
+      {
+        "id": "2",
+        "email": "client@fundrecovery.com",
+        "password": "client123",
+        "role": "client",
+        "name": "Client User"
+      },
+      {
+        "id": "user-1777283289822",
+        "email": "test@example.com",
+        "password": "password123",
+        "role": "client",
+        "name": "Test User"
+      },
+      {
+        "id": "user-1777283505875",
+        "email": "admin@gmail.com",
+        "password": "123456789",
+        "role": "client",
+        "name": "Abdullahi bello"
+      }
+    ],
+    "sessions": [
+      {
+        "token": "9ecb10ae-1105-46cf-9571-5474940b702c",
+        "userId": "user-1777283289822",
+        "expiresAt": "2026-05-04T09:48:09.822Z"
+      },
+      {
+        "token": "f170633a-622b-4a2d-b0c0-9ffebed98abb",
+        "userId": "1",
+        "expiresAt": "2026-05-04T09:53:30.456Z"
+      }
+    ]
+  },
+  "contactSubmissions": [],
+  "consultationSubmissions": []
+}

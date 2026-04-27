@@ -1,7 +1,22 @@
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router";
 import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
+import { api } from "../../api";
+
+const initialFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+};
 
 export function Contact() {
+  const [form, setForm] = useState(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+
   const contactMethods = [
     {
       icon: <Phone className="w-8 h-8" />,
@@ -29,13 +44,55 @@ export function Contact() {
     },
   ];
 
+  const updateField = (field: keyof typeof initialFormState, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
+      setSubmitError("Please complete your name, email, and phone number.");
+      return;
+    }
+
+    if (form.message.trim().length < 10) {
+      setSubmitError("Please enter a short message with at least 10 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post<{ message: string }>("/contact-submissions", {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        subject: form.subject,
+        message: form.message,
+      });
+      setForm(initialFormState);
+      setSubmitSuccess(response.message);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "We could not send your message right now. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
       <section className="bg-[#0a0f2c] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            We're here to help 24/7. Reach out to us through any of these channels.
+            We&apos;re here to help 24/7. Reach out to us through any of these channels.
           </p>
         </div>
       </section>
@@ -57,16 +114,19 @@ export function Contact() {
             <div>
               <h2 className="text-3xl font-bold text-[#0a0f2c] mb-6">Quick Contact Form</h2>
               <p className="text-gray-600 mb-8">
-                Fill out this form and we'll get back to you within 24 hours. For urgent cases, please call our hotline.
+                Fill out this form and we&apos;ll get back to you within 24 hours. For urgent cases, please call our hotline.
               </p>
 
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-sm font-semibold text-[#0a0f2c] mb-2">Full Name *</label>
                   <input
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="John Doe"
+                    value={form.name}
+                    onChange={(event) => updateField("name", event.target.value)}
+                    required
                   />
                 </div>
 
@@ -76,6 +136,9 @@ export function Contact() {
                     type="email"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="john@example.com"
+                    value={form.email}
+                    onChange={(event) => updateField("email", event.target.value)}
+                    required
                   />
                 </div>
 
@@ -85,6 +148,9 @@ export function Contact() {
                     type="tel"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="+1 (555) 123-4567"
+                    value={form.phone}
+                    onChange={(event) => updateField("phone", event.target.value)}
+                    required
                   />
                 </div>
 
@@ -94,6 +160,8 @@ export function Contact() {
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="Inquiry about recovery services"
+                    value={form.subject}
+                    onChange={(event) => updateField("subject", event.target.value)}
                   />
                 </div>
 
@@ -103,14 +171,30 @@ export function Contact() {
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none resize-none"
                     placeholder="Tell us about your situation..."
+                    value={form.message}
+                    onChange={(event) => updateField("message", event.target.value)}
+                    required
                   />
                 </div>
 
+                {submitError ? (
+                  <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {submitError}
+                  </p>
+                ) : null}
+
+                {submitSuccess ? (
+                  <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                    {submitSuccess}
+                  </p>
+                ) : null}
+
                 <button
                   type="submit"
-                  className="w-full bg-[#f0a500] hover:bg-[#d89400] text-[#0a0f2c] px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+                  className="w-full bg-[#f0a500] hover:bg-[#d89400] text-[#0a0f2c] px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 disabled:transform-none disabled:opacity-70"
+                  disabled={isSubmitting}
                 >
-                  Send Message
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>
@@ -185,7 +269,7 @@ export function Contact() {
           <div className="bg-[#0a0f2c] text-white p-12 rounded-2xl text-center">
             <h2 className="text-3xl font-bold mb-4">Time is Critical in Fund Recovery</h2>
             <p className="text-xl text-gray-300 mb-8">
-              The sooner you contact us, the better your chances of recovery. Don't wait—act now.
+              The sooner you contact us, the better your chances of recovery. Don&apos;t wait, act now.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

@@ -1,6 +1,23 @@
+import { useState, type FormEvent } from "react";
 import { Shield, Lock, Clock, CheckCircle, Phone } from "lucide-react";
+import { api } from "../../api";
+
+const initialFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  scamType: "",
+  amountRange: "",
+  description: "",
+  consent: false,
+};
 
 export function FreeConsultation() {
+  const [form, setForm] = useState(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+
   const benefits = [
     {
       icon: <Shield className="w-8 h-8" />,
@@ -24,13 +41,65 @@ export function FreeConsultation() {
     },
   ];
 
+  const updateField = (
+    field: keyof typeof initialFormState,
+    value: string | boolean,
+  ) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
+      setSubmitError("Please complete your name, email, and phone number.");
+      return;
+    }
+
+    if (!form.scamType || !form.amountRange) {
+      setSubmitError("Please select the scam type and amount lost.");
+      return;
+    }
+
+    if (form.description.trim().length < 20) {
+      setSubmitError("Please provide a little more detail about the incident.");
+      return;
+    }
+
+    if (!form.consent) {
+      setSubmitError("You must agree to the privacy consent before submitting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post<{ message: string }>(
+        "/consultation-submissions",
+        form,
+      );
+      setForm(initialFormState);
+      setSubmitSuccess(response.message);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "We could not submit your request right now. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
       <section className="bg-[#0a0f2c] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Free Consultation</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Get expert advice on your case at no cost. We'll assess your situation and explain your recovery options.
+            Get expert advice on your case at no cost. We&apos;ll assess your situation and explain your recovery options.
           </p>
         </div>
       </section>
@@ -54,13 +123,15 @@ export function FreeConsultation() {
                 Fill out the form below and our recovery specialists will contact you within 24 hours to discuss your case.
               </p>
 
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-sm font-semibold text-[#0a0f2c] mb-2">Full Name *</label>
                   <input
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="Enter your full name"
+                    value={form.name}
+                    onChange={(event) => updateField("name", event.target.value)}
                     required
                   />
                 </div>
@@ -71,6 +142,8 @@ export function FreeConsultation() {
                     type="email"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="your@email.com"
+                    value={form.email}
+                    onChange={(event) => updateField("email", event.target.value)}
                     required
                   />
                 </div>
@@ -81,13 +154,20 @@ export function FreeConsultation() {
                     type="tel"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
                     placeholder="+1 (555) 123-4567"
+                    value={form.phone}
+                    onChange={(event) => updateField("phone", event.target.value)}
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-[#0a0f2c] mb-2">Type of Scam *</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none">
+                  <select
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
+                    value={form.scamType}
+                    onChange={(event) => updateField("scamType", event.target.value)}
+                    required
+                  >
                     <option value="">Select scam type</option>
                     <option value="crypto">Crypto & Bitcoin Scam</option>
                     <option value="romance">Romance Scam</option>
@@ -103,7 +183,12 @@ export function FreeConsultation() {
 
                 <div>
                   <label className="block text-sm font-semibold text-[#0a0f2c] mb-2">Amount Lost *</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none">
+                  <select
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none"
+                    value={form.amountRange}
+                    onChange={(event) => updateField("amountRange", event.target.value)}
+                    required
+                  >
                     <option value="">Select amount range</option>
                     <option value="under5k">Under $5,000</option>
                     <option value="5k-10k">$5,000 - $10,000</option>
@@ -121,6 +206,8 @@ export function FreeConsultation() {
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f0a500] focus:border-transparent outline-none resize-none"
                     placeholder="Please provide details about what happened, when it occurred, and any other relevant information..."
+                    value={form.description}
+                    onChange={(event) => updateField("description", event.target.value)}
                     required
                   />
                 </div>
@@ -130,6 +217,8 @@ export function FreeConsultation() {
                     type="checkbox"
                     id="consent"
                     className="mt-1"
+                    checked={form.consent}
+                    onChange={(event) => updateField("consent", event.target.checked)}
                     required
                   />
                   <label htmlFor="consent" className="text-sm text-gray-600">
@@ -137,15 +226,28 @@ export function FreeConsultation() {
                   </label>
                 </div>
 
+                {submitError ? (
+                  <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {submitError}
+                  </p>
+                ) : null}
+
+                {submitSuccess ? (
+                  <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                    {submitSuccess}
+                  </p>
+                ) : null}
+
                 <button
                   type="submit"
-                  className="w-full bg-[#f0a500] hover:bg-[#d89400] text-[#0a0f2c] px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+                  className="w-full bg-[#f0a500] hover:bg-[#d89400] text-[#0a0f2c] px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 disabled:transform-none disabled:opacity-70"
+                  disabled={isSubmitting}
                 >
-                  Get Free Consultation
+                  {isSubmitting ? "Submitting..." : "Get Free Consultation"}
                 </button>
 
                 <p className="text-center text-sm text-gray-500">
-                  By submitting this form, you agree to our terms and conditions. We'll never share your information with third parties.
+                  By submitting this form, you agree to our terms and conditions. We&apos;ll never share your information with third parties.
                 </p>
               </form>
             </div>
@@ -194,7 +296,7 @@ export function FreeConsultation() {
                     <div>
                       <h4 className="font-semibold mb-1">You Decide</h4>
                       <p className="text-gray-300 text-sm">
-                        No pressure—you choose whether to proceed with our recovery services
+                        No pressure, you choose whether to proceed with our recovery services
                       </p>
                     </div>
                   </li>
@@ -218,7 +320,7 @@ export function FreeConsultation() {
               <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded">
                 <h4 className="font-bold text-green-900 mb-2">Why Act Quickly?</h4>
                 <p className="text-green-800 text-sm">
-                  Time is critical in fund recovery cases. The sooner we start investigating and tracing your funds, the higher your chances of successful recovery. Scammers move money quickly—don't give them more time.
+                  Time is critical in fund recovery cases. The sooner we start investigating and tracing your funds, the higher your chances of successful recovery. Scammers move money quickly, do not give them more time.
                 </p>
               </div>
             </div>
