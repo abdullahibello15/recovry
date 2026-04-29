@@ -52,7 +52,13 @@ export const Signup: React.FC = () => {
     setIsSubmitting(false);
 
     if (result === true) {
-      navigate("/dashboard", { replace: true });
+      navigate("/login", {
+        replace: true,
+        state: {
+          signupSuccess:
+            "Account created successfully. Sign in with your new credentials.",
+        },
+      });
     } else {
       setError(result);
     }

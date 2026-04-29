@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,6 +10,7 @@ const dbPath = path.join(__dirname, "db.json");
 const port = Number(process.env.API_PORT || 8787);
 const host = "127.0.0.1";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const PASSWORD_HASH_PREFIX = "scrypt";
 const initialDbSnapshot = JSON.parse(await fs.readFile(dbPath, "utf8"));
 
 async function readDb() {
@@ -45,6 +46,37 @@ function forbidden(res, message = "Forbidden") {
 
 function badRequest(res, message) {
   json(res, 400, { error: message });
+}
+
+function hashPassword(password) {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(String(password), salt, 64).toString("hex");
+  return `${PASSWORD_HASH_PREFIX}:${salt}:${hash}`;
+}
+
+function verifyPassword(password, storedHash) {
+  if (!storedHash?.startsWith(`${PASSWORD_HASH_PREFIX}:`)) {
+    return false;
+  }
+
+  const [, salt, expectedHash] = storedHash.split(":");
+  if (!salt || !expectedHash) {
+    return false;
+  }
+
+  const actual = scryptSync(String(password), salt, 64);
+  const expected = Buffer.from(expectedHash, "hex");
+
+  return expected.length === actual.length && timingSafeEqual(actual, expected);
+}
+
+function verifyLegacyPassword(password, user) {
+  return typeof user.password === "string" && user.password === String(password);
+}
+
+function upgradeLegacyPassword(user, password) {
+  user.passwordHash = hashPassword(password);
+  delete user.password;
 }
 
 async function parseBody(req) {
@@ -302,13 +334,20 @@ const server = createServer(async (req, res) => {
       }
 
       const user = db.auth.users.find(
-        (entry) =>
-          entry.email.toLowerCase() === String(email).toLowerCase() &&
-          entry.password === password,
+        (entry) => entry.email.toLowerCase() === String(email).toLowerCase(),
       );
 
-      if (!user) {
+      const isValidPassword =
+        user &&
+        (verifyPassword(password, user.passwordHash) ||
+          verifyLegacyPassword(password, user));
+
+      if (!user || !isValidPassword) {
         return unauthorized(res, "Invalid email or password");
+      }
+
+      if (!user.passwordHash) {
+        upgradeLegacyPassword(user, password);
       }
 
       db.auth.sessions = db.auth.sessions.filter(
@@ -353,25 +392,16 @@ const server = createServer(async (req, res) => {
       const user = {
         id: `user-${Date.now()}`,
         email,
-        password: String(body.password),
+        passwordHash: hashPassword(body.password),
         role: "client",
         name: String(body.name).trim(),
       };
 
       db.auth.users.push(user);
-
-      const token = randomUUID();
-      const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString();
-      db.auth.sessions.push({
-        token,
-        userId: user.id,
-        expiresAt,
-      });
-
       await writeDb(db);
 
       return json(res, 201, {
-        token,
+        ok: true,
         user: sanitizeUser(user),
       });
     }

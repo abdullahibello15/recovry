@@ -215,42 +215,44 @@
       {
         "id": "1",
         "email": "admin@fundrecovery.com",
-        "password": "FR-Admin-2026!",
+        "passwordHash": "scrypt:0705a6911703700b4705357e71379dc0:056af063e1b54d0777711610a88d03e1a12fe3766cd8e70f4dfb1c30f86b5ee0c78bf1281c2191105fbbd37efafa5971a73599b2be77025622c9f5519e384001",
         "role": "admin",
         "name": "Admin User"
       },
       {
         "id": "2",
         "email": "client@fundrecovery.com",
-        "password": "client123",
+        "passwordHash": "scrypt:06d1f752b3bb20f1458b510c1a3a29bb:4fe12ec6b10463a236386c697f35a4e1fdb584efc0ec9f0436550cd914e11a01ae7881f1f99eefc94dec84f374de361eaf4059402eb4601b1239ca1597d2e624",
         "role": "client",
         "name": "Client User"
       },
       {
         "id": "user-1777283289822",
         "email": "test@example.com",
-        "password": "password123",
+        "passwordHash": "scrypt:e7b6b2ba935342d9ce5787654e093b10:ea4dd9929add254d05fb49a4d9ca76442fb594aa69186ef7f750aaba7b7f5c510b5e0195db2a52667027f56067d467d29eadfe168051fb080f57e16cbb7764b3",
         "role": "client",
         "name": "Test User"
       },
       {
         "id": "user-1777283505875",
         "email": "admin@gmail.com",
-        "password": "123456789",
+        "passwordHash": "scrypt:a244f1c0c54d13ec17edb32611b6952d:1375a2154abc299415b0981cd39e4c03e67b04e133a152b250a0726c276a7db23759baa6bf5fcc8808d8a03c163d623c4814d966f3943c341c692399b6bcf2ad",
+        "role": "client",
+        "name": "Abdullahi bello"
+      },
+      {
+        "id": "user-1777424753860",
+        "email": "amina@carereach.org",
+        "passwordHash": "scrypt:dc33bb73ad97a22c93972b70805bef54:ce1f90e666c8fd43fd2c7c75f2f274e5d7abffd03ff24bef8d7f96363420539b794b7849147c722332cfb857dd918d4fecab6ec8d998a68a236a678e0e81d9d1",
         "role": "client",
         "name": "Abdullahi bello"
       }
     ],
     "sessions": [
       {
-        "token": "9ecb10ae-1105-46cf-9571-5474940b702c",
-        "userId": "user-1777283289822",
-        "expiresAt": "2026-05-04T09:48:09.822Z"
-      },
-      {
-        "token": "f170633a-622b-4a2d-b0c0-9ffebed98abb",
-        "userId": "1",
-        "expiresAt": "2026-05-04T09:53:30.456Z"
+        "token": "36ac9944-6069-4f61-8fdc-9069c97d3958",
+        "userId": "user-1777424753860",
+        "expiresAt": "2026-05-06T01:05:53.970Z"
       }
     ]
   },

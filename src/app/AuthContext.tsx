@@ -13,6 +13,11 @@ type LoginResponse = {
   user: User;
 };
 
+type SignupResponse = {
+  ok: true;
+  user: User;
+};
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
@@ -96,13 +101,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
   ): Promise<string | true> => {
     try {
-      const data = await api.post<LoginResponse>("/auth/signup", {
+      await api.post<SignupResponse>("/auth/signup", {
         name,
         email,
         password,
       });
-      api.setAuthToken(data.token);
-      setUser(data.user);
+      api.setAuthToken(null);
+      setUser(null);
       return true;
     } catch (error) {
       api.setAuthToken(null);
